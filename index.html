@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#070b14">
+<title>CYBERLAB X | Malware Simulator</title>
+<style>
+:root{--bg:#070b14;--panel:#101827;--panel2:#0b1320;--line:#26384f;--text:#edf4ff;--muted:#91a4bc;--cyan:#49e5ff;--green:#5af3b0;--red:#ff617a;--orange:#ffbd67;--purple:#bd98ff;--accent:var(--cyan)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font-family:Inter,"Segoe UI",Arial,sans-serif;background:radial-gradient(ellipse at 12% 0%,#15304c 0,transparent 34%),radial-gradient(ellipse at 95% 25%,#25183c 0,transparent 28%),var(--bg);min-height:100vh}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:36px 36px}
+button,input{font:inherit}button{touch-action:manipulation}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:16px clamp(14px,5vw,64px);border-bottom:1px solid #26384f99;position:sticky;top:0;z-index:10;background:#070b14e8;backdrop-filter:blur(16px)}
+.logo{font-size:19px;font-weight:950;letter-spacing:2px}.logo span{color:var(--cyan)}
+.header-right{display:flex;align-items:center;gap:8px;color:var(--green);font-size:10px;letter-spacing:1px}.dot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #5af3b177}
+main{max-width:1380px;margin:auto;padding:0 clamp(12px,2.2vw,28px)}
+.hero{text-align:center;padding:45px 10px 30px}.eyebrow{font-size:10px;letter-spacing:2.3px;color:var(--green);font-weight:850}
+h1{font-size:clamp(34px,5vw,62px);letter-spacing:-2px;margin:15px 0}h1 span{color:var(--cyan);text-shadow:0 0 35px #49e5ff24}
+.hero p{max-width:730px;margin:auto;color:var(--muted);font-size:13px;line-height:1.9}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:10px 0 27px}.metric{min-width:0;background:#101827d9;border:1px solid var(--line);border-radius:11px;padding:14px 16px}.metric strong{display:block;font-size:clamp(17px,2vw,23px);color:var(--cyan);margin-bottom:4px;overflow-wrap:anywhere}.metric span{color:var(--muted);font-size:9px;letter-spacing:.7px}
+.kicker{font-size:10px;color:var(--cyan);letter-spacing:2px;font-weight:900}.section-title{font-size:clamp(23px,3vw,30px);letter-spacing:-.7px;margin:10px 0}.section-description{font-size:12px;color:var(--muted);line-height:1.8;max-width:760px}
+.threat-buttons{display:flex;flex-wrap:wrap;gap:9px;margin:22px 0 15px}.threat-btn{padding:11px 16px;border:1px solid var(--line);border-radius:8px;color:var(--muted);background:#0d1523;cursor:pointer;font-size:12px;font-weight:800;transition:border-color .2s,color .2s,background .2s}.threat-btn:hover{border-color:var(--cyan);color:var(--text)}.threat-btn.active{border-color:var(--accent);background:#49e5ff10;color:var(--accent);box-shadow:0 0 20px #49e5ff0c}
+.sim-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.82fr);gap:15px;align-items:stretch}.panel{border:1px solid var(--line);background:linear-gradient(145deg,#111b2bf5,#0b1220f5);border-radius:14px;overflow:hidden;min-width:0}.panel-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-label{font-size:10px;font-weight:900;letter-spacing:1.4px}.small{font-size:10px;color:var(--muted);line-height:1.7}.badge{font-size:9px;color:var(--green);border:1px solid #5af3b044;padding:6px 8px;border-radius:5px;letter-spacing:.8px;white-space:nowrap}
+.computer-screen{margin:14px;background:#080f1a;border:1px solid #30445c;border-radius:10px;overflow:hidden;position:relative;box-shadow:0 10px 35px #0003;--accent:var(--cyan)}.window-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:#121c2b;border-bottom:1px solid #26384e;font-size:9px;letter-spacing:.8px;color:#a2b5cd}.window-dots{display:flex;gap:5px;flex-shrink:0}.window-dots i{width:7px;height:7px;border-radius:50%;background:#536379}.window-dots i:first-child{background:var(--red)}.window-dots i:nth-child(2){background:var(--orange)}.window-dots i:nth-child(3){background:var(--green)}
+.screen-content{min-height:350px;padding:16px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 45% 48%,color-mix(in srgb,var(--accent) 10%,transparent) 0,transparent 69%),#080f1a}
+.screen-content:before{content:"";position:absolute;left:0;right:0;top:-38%;height:30%;z-index:0;pointer-events:none;opacity:0;background:linear-gradient(180deg,transparent 0%,color-mix(in srgb,var(--accent) 3%,transparent) 55%,color-mix(in srgb,var(--accent) 15%,transparent) 96%,color-mix(in srgb,var(--accent) 25%,transparent) 100%);border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent);filter:blur(.5px)}
+.computer-screen.is-running .screen-content:before{animation:scanSweep 3.4s cubic-bezier(.35,0,.2,1) infinite}
+.screen-content:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(transparent 50%,#00000009 50%);background-size:100% 4px;opacity:.25;z-index:4}
+.scene-caption{display:flex;justify-content:space-between;gap:10px;font-size:9px;letter-spacing:1px;color:#9bb0cb;position:relative;z-index:5}.scene-caption b{color:var(--accent);text-align:right}.scene-view{display:none;position:relative;z-index:1;min-height:285px;align-items:center;justify-content:center}.computer-screen[data-threat="virus"] .virus-view{display:flex}.computer-screen[data-threat="worm"] .worm-view{display:block}.computer-screen[data-threat="trojan"] .trojan-view{display:flex}
+.monitor-wrap{width:40%;max-width:205px;flex-shrink:0;text-align:center}.monitor{padding:7px;border:2px solid #61758b;border-radius:8px;background:#152338;box-shadow:0 0 26px #49e5ff10;position:relative;transition:border-color .3s,box-shadow .3s}.monitor-inner{min-height:120px;background:linear-gradient(145deg,#132942,#0b1625);padding:12px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;overflow:hidden;position:relative}.monitor-inner:after{content:"";position:absolute;left:-110%;top:0;width:60%;height:100%;background:linear-gradient(90deg,transparent,#49e5ff16,transparent);transform:skewX(-18deg)}.computer-screen.is-running .monitor-inner:after{animation:screenShine 2.5s linear infinite}.computer-screen.is-running .monitor{animation:monitorAura 2.8s ease-in-out infinite}.monitor-globe{font-size:34px;filter:drop-shadow(0 0 10px #49e5ff44)}.monitor-name{font-size:9px;letter-spacing:1px}.monitor-sub{font-size:8px;color:var(--muted)}.monitor-neck{height:15px;width:20px;margin:auto;background:#53677e}.monitor-foot{width:52px;height:4px;margin:auto;border-radius:5px;background:#61758b}
+.flow-files{flex:1;min-width:0;display:grid;gap:9px}.file{display:flex;align-items:center;gap:8px;padding:11px 9px;border:1px solid #2a3d54;border-radius:7px;background:#0d1726;position:relative;overflow:hidden;transition:border-color .35s,background .35s,transform .35s;min-width:0}.file-icon{font-size:19px;flex-shrink:0}.file-info{min-width:0}.file-info b{font-size:9px;display:block;overflow-wrap:anywhere}.file-info small{display:block;color:var(--muted);font-size:8px;margin-top:4px;line-height:1.4}.file-state{margin-left:auto;font-size:8px;color:var(--green);white-space:nowrap}.computer-screen[data-stage="attach"] #file1,.computer-screen[data-stage="activate"] #file1{border-color:var(--red);background:#291725;transform:translateX(3px);animation:fileAlert 1.5s ease-in-out infinite}.computer-screen[data-stage="spread"] #file1,.computer-screen[data-stage="spread"] #file2,.computer-screen[data-stage="spread"] #file3{border-color:var(--red);background:#291725;box-shadow:0 0 20px #ff617a17;animation:fileAlert 1.5s ease-in-out infinite}.computer-screen[data-stage="attach"] #file1 .file-state,.computer-screen[data-stage="activate"] #file1 .file-state,.computer-screen[data-stage="spread"] .file-state{color:var(--red)}.computer-screen[data-stage="detected"] .file,.computer-screen[data-stage="protected"] .file{border-color:#5af3b155}.computer-screen[data-stage="protected"] .file-state{color:var(--green)}
+
+.network-map{position:relative;height:270px;margin:8px auto 0;max-width:510px}.network-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}.network-lines line{stroke:#35516c;stroke-width:1.7;stroke-dasharray:5 5;transition:stroke .3s,stroke-width .3s}.computer-screen[data-stage="spread1"] .network-lines line:nth-child(1),.computer-screen[data-stage="spread2"] .network-lines line,.computer-screen[data-stage="contained"] .network-lines line,.computer-screen[data-stage="protected"] .network-lines line{stroke:var(--accent);stroke-width:2.4;animation:dashFlow 1s linear infinite}.network-node{position:absolute;width:100px;min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;border:1px solid #36506a;background:#112035;border-radius:10px;padding:8px;transition:border-color .3s,background .3s,box-shadow .3s,transform .3s;z-index:2}.network-node .ni{font-size:23px}.network-node b{font-size:9px}.network-node small{font-size:8px;color:var(--muted)}.node-a{left:calc(50% - 50px);top:0}.node-b{left:2%;top:95px}.node-c{right:2%;top:95px}.node-d{left:calc(50% - 50px);bottom:0}.computer-screen[data-stage="scan"] .node-a,.computer-screen[data-stage="spread1"] .node-b,.computer-screen[data-stage="spread2"] .node-c,.computer-screen[data-stage="spread2"] .node-d{border-color:var(--red);background:#311926;box-shadow:0 0 23px #ff617a21;animation:nodePulse 1s infinite}.computer-screen[data-stage="contained"] .network-node,.computer-screen[data-stage="protected"] .network-node{border-color:#5af3b177;background:#102b29}.computer-screen[data-stage="protected"] .node-d{box-shadow:0 0 20px #5af3b11b}
+.trojan-view{gap:clamp(10px,3vw,25px);padding-top:24px}.app-card{width:43%;max-width:180px;padding:19px 9px;border:1px solid #435168;background:linear-gradient(145deg,#1b2840,#0b1422);border-radius:12px;text-align:center;transition:border-color .35s,box-shadow .35s,transform .35s;position:relative}.app-icon{width:65px;height:65px;margin:0 auto 12px;display:grid;place-items:center;font-size:32px;border-radius:15px;background:linear-gradient(135deg,#7c65d0,#313a75);box-shadow:0 0 27px #bd98ff18}.app-card b{font-size:11px;display:block}.app-card small{color:var(--muted);font-size:8px;display:block;line-height:1.6;margin-top:6px}.fake-stamp{margin-top:12px;display:inline-block;font-size:8px;color:var(--green);border:1px solid #5af3b144;padding:5px;border-radius:4px}.computer-screen.is-running .app-card{animation:appFloat 3s ease-in-out infinite}.computer-screen[data-stage="reveal"] .app-card,.computer-screen[data-stage="suspicious"] .app-card{border-color:var(--red);box-shadow:0 0 28px #ff617a18;transform:translateY(-3px)}.computer-screen[data-stage="reveal"] .fake-stamp,.computer-screen[data-stage="suspicious"] .fake-stamp{color:var(--red);border-color:#ff617a66}.computer-screen[data-stage="detected"] .app-card,.computer-screen[data-stage="protected"] .app-card{border-color:var(--green)}.flow-arrow{color:var(--accent);font-size:24px;animation:arrowPulse 1s ease-in-out infinite}.defence-box{width:37%;max-width:145px;text-align:center;padding:15px 8px;background:#0f1d2d;border:1px solid #36506a;border-radius:10px;transition:border-color .3s,background .3s,box-shadow .3s}.defence-icon{font-size:31px;margin-bottom:9px}.defence-box b{font-size:10px;display:block}.defence-box small{font-size:8px;line-height:1.5;color:var(--muted);display:block;margin-top:6px}.computer-screen[data-stage="detected"] .defence-box,.computer-screen[data-stage="protected"] .defence-box{border-color:var(--green);background:#102b29;box-shadow:0 0 22px #5af3b114}
+.screen-bottom{padding:10px 14px;border-top:1px solid #26384e;background:#0c1522;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:9px;color:var(--muted)}.screen-bottom strong{color:var(--green);text-align:right}.console{display:flex;flex-direction:column;min-height:100%}.console-body{padding:15px;display:flex;flex-direction:column;gap:12px}.console-line{font-size:10px;display:flex;gap:8px;line-height:1.65;color:#b4c4d8;animation:logIn .25s ease}.console-time{color:#647c98;white-space:nowrap}.console-line.info .console-msg{color:var(--cyan)}.console-line.warn .console-msg{color:var(--orange)}.console-line.alert .console-msg{color:var(--red)}.console-line.safe .console-msg{color:var(--green)}.log-window{flex:1;min-height:210px;overflow:auto;max-height:370px}.log-bottom{margin-top:auto;padding:14px;border-top:1px solid var(--line)}.log-summary{display:flex;justify-content:space-between;gap:8px;font-size:10px;margin-bottom:10px}.log-summary span{color:var(--muted)}
+.speed-row{display:flex;align-items:center;gap:12px;font-size:10px;color:var(--muted)}.speed-row label{white-space:nowrap}.speed-row input{width:100%;min-width:30px;accent-color:var(--cyan);cursor:pointer}.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.action-btn{border:1px solid #344b64;background:#121e2e;color:var(--text);border-radius:7px;padding:10px 13px;font-size:10px;font-weight:800;cursor:pointer;transition:transform .2s,border-color .2s,color .2s}.action-btn:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-1px)}.action-btn.primary{background:var(--cyan);border-color:var(--cyan);color:#06131b}.stage-progress{height:4px;background:#26374d;margin-top:14px;border-radius:5px;overflow:hidden}.stage-progress div{height:100%;width:0;background:var(--cyan);box-shadow:0 0 12px var(--cyan);transition:width .35s}
+.details{padding:43px 0 45px}.details-head{margin-bottom:20px}.details-head .section-title{font-size:clamp(25px,3.5vw,33px)}.details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.detail-card{background:linear-gradient(145deg,#111b2a,#0b1320);border:1px solid var(--line);border-radius:12px;padding:20px;min-width:0}.detail-head{display:flex;gap:12px;align-items:center;margin-bottom:12px}.detail-icon{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0;border:1px solid #49e5ff33;background:#49e5ff0b;border-radius:9px;font-size:17px}.detail-card h3{font-size:14px;margin:0}.detail-card p{font-size:12px;color:#b0bfd2;line-height:1.9;margin:0}.detail-card ul{margin:0;padding-left:18px;color:#b0bfd2;font-size:12px;line-height:1.95}.risk-card{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px}.risk-info{flex:1}.risk-info p{margin-top:7px}.risk-level{min-width:140px;text-align:right}.risk-level strong{font-size:clamp(13px,2vw,17px);color:var(--orange);display:block;overflow-wrap:anywhere}.risk-level small{display:block;font-size:9px;color:var(--muted);margin-top:5px}.notice{margin-top:18px;padding:15px 17px;border:1px solid #5af3b133;border-radius:10px;background:#5af3b108;color:#b6d9cc;font-size:11px;line-height:1.9}footer{text-align:center;padding:25px 15px;border-top:1px solid var(--line);font-size:10px;line-height:1.9;color:var(--muted)}footer strong{color:var(--cyan)}
+@keyframes scanSweep{0%{top:-38%;opacity:0}12%{opacity:.9}76%{opacity:.6}100%{top:112%;opacity:0}}
+@keyframes fileAlert{0%,100%{box-shadow:0 0 0 #ff617a00;filter:saturate(1)}50%{box-shadow:0 0 20px #ff617a29;filter:saturate(1.25)}}
+@keyframes nodePulse{50%{box-shadow:0 0 25px #ff617a50}}
+@keyframes arrowPulse{50%{opacity:.35;transform:translateX(3px)}}
+@keyframes dashFlow{to{stroke-dashoffset:-20}}
+@keyframes screenShine{to{left:150%}}
+@keyframes monitorAura{0%,100%{box-shadow:0 0 18px color-mix(in srgb,var(--accent) 8%,transparent)}50%{box-shadow:0 0 34px color-mix(in srgb,var(--accent) 22%,transparent)}}
+@keyframes appFloat{0%,100%{filter:brightness(1);transform:translateY(0)}50%{filter:brightness(1.08);transform:translateY(-3px)}}
+@keyframes logIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:900px){.sim-grid{grid-template-columns:minmax(0,1fr)}.console{min-height:0}.log-window{min-height:100px;max-height:230px}.computer-screen{margin:12px}.screen-content{min-height:330px}}
+@media(max-width:580px){header{padding:13px 4%}.logo{font-size:16px}.header-right{font-size:8px;letter-spacing:.4px}.hero{padding-top:35px}h1{letter-spacing:-1px}.metrics{gap:8px}.metric{padding:12px}.metric span{font-size:8px}.threat-buttons{display:grid;grid-template-columns:1fr;gap:8px}.threat-btn{text-align:left;padding:12px}.computer-screen{margin:8px}.screen-content{padding:10px;min-height:310px}.scene-caption{font-size:8px;letter-spacing:.5px}.scene-view{min-height:270px}.monitor-wrap{width:38%}.monitor-inner{min-height:95px}.monitor-globe{font-size:25px}.monitor-name{font-size:7px}.flow-files{gap:7px}.file{padding:8px 5px;gap:5px}.file-icon{font-size:14px}.file-info b{font-size:8px}.file-info small{font-size:7px}.file-state{font-size:7px}.network-map{height:260px}.network-node{width:82px;min-height:68px;padding:5px}.node-a,.node-d{left:calc(50% - 41px)}.node-b{left:0}.node-c{right:0}.trojan-view{gap:9px}.app-card{padding:12px 6px}.app-icon{width:48px;height:48px;font-size:25px}.defence-box{padding:11px 5px}.defence-icon{font-size:25px}.flow-arrow{font-size:19px}.panel-head{padding:13px}.screen-bottom{font-size:8px;padding:9px 10px}.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.action-btn{padding:10px 4px;font-size:9px}.speed-row{gap:8px}.details-grid{grid-template-columns:1fr}.risk-card{grid-column:auto;align-items:flex-start}.risk-level{min-width:105px}.detail-card{padding:17px}.section-description{font-size:11px}}
+@media(max-width:360px){.header-right{font-size:7px}.screen-content{padding:8px}.monitor-wrap{width:34%}.monitor{padding:4px}.flow-files{gap:5px}.file-info small{display:none}.file-state{font-size:6px}.app-card b{font-size:9px}.app-card small{font-size:7px}.risk-card{flex-direction:column}.risk-level{text-align:left}.scene-caption{font-size:7px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">CYBER<span>LAB</span> X</div>
+  <div class="header-right"><span class="dot"></span> SAFE SIMULATION MODE</div>
+</header>
+<main>
+  <section class="hero">
+    <div class="eyebrow">CYBERSECURITY EDUCATION / INTERACTIVE LAB</div>
+    <h1>Malware <span>Simulator</span></h1>
+    <p>Select Virus, Worm or Trojan. Watch the virtual computer animation, follow the activity log, and learn each threat's process, potential harm, solution and security measures.</p>
+  </section>
+
+  <div class="metrics">
+    <div class="metric"><strong id="metricThreat">VIRUS</strong><span>SELECTED THREAT</span></div>
+    <div class="metric"><strong id="metricEvents">00</strong><span>SIMULATION EVENTS</span></div>
+    <div class="metric"><strong id="metricStatus">READY</strong><span>COMPUTER STATUS</span></div>
+    <div class="metric"><strong>SAFE</strong><span>REAL FILES / NETWORK</span></div>
+  </div>
+
+  <section id="lab">
+    <div class="kicker">01 / VIRTUAL ENVIRONMENT</div>
+    <div class="section-title">Threat Simulation Lab</div>
+    <div class="section-description">Click a threat to run its animated demonstration. All computers, files, apps and network nodes are fictional visual models.</div>
+
+    <div class="threat-buttons" role="group" aria-label="Select threat">
+      <button class="threat-btn active" data-threat="virus" aria-pressed="true">🦠 Virus Lab</button>
+      <button class="threat-btn" data-threat="worm" aria-pressed="false">🕸️ Worm Network</button>
+      <button class="threat-btn" data-threat="trojan" aria-pressed="false">🎭 Trojan Analysis</button>
+    </div>
+
+    <div class="sim-grid">
+      <section class="panel">
+        <div class="panel-head">
+          <div><div class="panel-label">VIRTUAL COMPUTER</div><div class="small" id="computerName" style="margin-top:5px">WORKSTATION-01 / FILE SIMULATION</div></div>
+          <span class="badge">EDUCATIONAL DEMO</span>
+        </div>
+        <div class="computer-screen" id="computerScreen" data-threat="virus" data-stage="ready">
+          <div class="window-bar">
+            <div class="window-dots"><i></i><i></i><i></i></div><span>CYBERLAB_VIRTUAL_OS</span><span>● LOCAL</span>
+          </div>
+          <div class="screen-content">
+            <div class="scene-caption"><span id="sceneName">VIRUS / FILE ENVIRONMENT</span><b id="sceneStatus">SYSTEM READY</b></div>
+            <div class="scene-view virus-view">
+              <div class="monitor-wrap"><div class="monitor"><div class="monitor-inner"><div class="monitor-globe">🖥️</div><div class="monitor-name">WORKSTATION-01</div><div class="monitor-sub">Virtual computer</div></div></div><div class="monitor-neck"></div><div class="monitor-foot"></div></div>
+              <div class="flow-files">
+                <div class="file" id="file1"><div class="file-icon">📄</div><div class="file-info"><b>report.doc</b><small>Virtual host file</small></div><span class="file-state">NORMAL</span></div>
+                <div class="file" id="file2"><div class="file-icon">🗂️</div><div class="file-info"><b>project.dat</b><small>Virtual file</small></div><span class="file-state">SAFE</span></div>
+                <div class="file" id="file3"><div class="file-icon">📋</div><div class="file-info"><b>notes.txt</b><small>Virtual file</small></div><span class="file-state">SAFE</span></div>
+              </div>
+            </div>
+            <div class="scene-view worm-view">
+              <div class="network-map">
+                <svg class="network-lines" viewBox="0 0 500 270" preserveAspectRatio="none" aria-hidden="true"><line x1="250" y1="40" x2="55" y2="125"/><line x1="250" y1="40" x2="445" y2="125"/><line x1="55" y1="125" x2="250" y2="230"/><line x1="445" y1="125" x2="250" y2="230"/></svg>
+                <div class="network-node node-a"><span class="ni">🖥️</span><b>DEVICE-01</b><small>Starting device</small></div>
+                <div class="network-node node-b"><span class="ni">💻</span><b>DEVICE-02</b><small>Virtual node</small></div>
+                <div class="network-node node-c"><span class="ni">💻</span><b>DEVICE-03</b><small>Virtual node</small></div>
+                <div class="network-node node-d"><span class="ni">🛡️</span><b>FIREWALL</b><small>Defence layer</small></div>
+              </div>
+            </div>
+            <div class="scene-view trojan-view">
+              <div class="app-card"><div class="app-icon">🎮</div><b>Free Game Demo</b><small>Fictional application<br>Appears to be a normal app</small><div class="fake-stamp" id="appStamp">NOT ANALYSED</div></div>
+              <div class="flow-arrow">➜</div>
+              <div class="defence-box"><div class="defence-icon">🛡️</div><b id="defenceTitle">Security Scan</b><small id="defenceSub">Virtual protection layer</small></div>
+            </div>
+          </div>
+          <div class="screen-bottom"><span id="screenFoot">System ready. Start the simulation.</span><strong id="screenState">● SAFE MODE</strong></div>
+        </div>
+        <div style="padding:0 15px 16px">
+          <div class="speed-row"><label for="speed">SIMULATION SPEED</label><input id="speed" type="range" min="1" max="5" value="3"><span id="speedLabel">Normal</span></div>
+          <div class="controls"><button class="action-btn primary" id="startBtn">▶ Start Simulation</button><button class="action-btn" id="pauseBtn">Ⅱ Pause</button><button class="action-btn" id="resetBtn">↻ Reset</button></div>
+          <div class="stage-progress"><div id="progressFill"></div></div>
+        </div>
+      </section>
+
+      <aside class="panel console">
+        <div class="panel-head"><div><div class="panel-label">SIMULATION TELEMETRY</div><div class="small" style="margin-top:5px">Virtual events only</div></div><span class="badge">LIVE LOG</span></div>
+        <div class="console-body log-window" id="eventLog" aria-live="polite">
+          <div class="console-line info"><span class="console-time">00:00</span><span class="console-msg">[INFO] Virtual system initialized.</span></div>
+          <div class="console-line safe"><span class="console-time">00:01</span><span class="console-msg">[SAFE] Real files and network are not accessed.</span></div>
+          <div class="console-line info"><span class="console-time">00:02</span><span class="console-msg">[READY] Choose a threat to start.</span></div>
+        </div>
+        <div class="log-bottom"><div class="log-summary"><strong>EVENT MONITOR</strong><span id="eventCount">0 events</span></div><div class="small">These entries describe the animation, not activity detected on your actual computer.</div></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="details" id="threatDetails">
+    <div class="details-head"><div class="kicker">02 / THREAT INFORMATION</div><div class="section-title" id="detailTitle">Virus — Threat Details</div><div class="section-description" id="detailIntro"></div></div>
+    <div class="details-grid">
+      <article class="detail-card"><div class="detail-head"><div class="detail-icon">⌁</div><h3>Threat</h3></div><p id="detailThreat"></p></article>
+      <article class="detail-card"><div class="detail-head"><div class="detail-icon">⚙</div><h3>Process</h3></div><p id="detailProcess"></p></article>
+      <article class="detail-card"><div class="detail-head"><div class="detail-icon">⚠</div><h3>Potential Harm</h3></div><ul id="detailHarm"></ul></article>
+      <article class="detail-card"><div class="detail-head"><div class="detail-icon">✓</div><h3>Solution</h3></div><ul id="detailSolution"></ul></article>
+      <article class="detail-card"><div class="detail-head"><div class="detail-icon">🛡</div><h3>Security Measures</h3></div><ul id="detailSecurity"></ul></article>
+      <article class="detail-card risk-card"><div class="risk-info"><div class="detail-head"><div class="detail-icon">◈</div><h3>Potential Harm Level</h3></div><p id="detailRiskText"></p></div><div class="risk-level"><strong id="detailRisk">MEDIUM–HIGH</strong><small>General guidance</small></div></article>
+    </div>
+    <div class="notice"><strong>SAFETY NOTICE</strong><br>This website is an educational visual simulator. It does not execute malware, infect real files, inspect your device or send traffic across a real network. Actual impact varies with the malware and system environment.</div>
+  </section>
+</main>
+<footer><strong>CYBERLAB X</strong> · Malware Awareness & Safe Simulation</footer>
+
+<script>
+"use strict";
+const threatData={
+ virus:{name:"Virus",label:"VIRUS",computer:"WORKSTATION-01 / FILE SIMULATION",scene:"VIRUS / FILE ENVIRONMENT",risk:"MEDIUM–HIGH",riskColor:"#ffbd67",intro:"A virus can attach to a legitimate file or program. Learn the process, potential harm, and ways to prevent or resolve an infection.",threat:"A computer virus is malware that attaches itself to a legitimate file or program and may activate when that host runs.",process:"When the infected host file is executed, the virus may activate and attempt to infect additional files or modify data. This animation uses virtual files only.",harm:["Files may be modified or corrupted.","Important information may be lost.","System stability and performance may be affected."],solution:["Run a full scan with trusted security software.","Quarantine or remove infected files identified by the scanner.","Restore clean files from a reliable backup if necessary."],security:["Avoid unknown downloads and email attachments.","Keep the operating system and software updated.","Enable real-time antivirus protection and maintain regular backups."],riskText:"Medium to high potential impact. Actual harm depends on the virus, affected files and the system's protections.",stages:[
+ ["ready","SYSTEM READY","Virtual host file selected."],["attach","HOST FILE SELECTED","The animation highlights a virtual host file."],["activate","HOST EXECUTION","The model illustrates how an infected host may activate."],["spread","POSSIBLE FILE IMPACT","Other virtual files are highlighted to represent possible infection."],["detected","DETECTION EXAMPLE","The simulation displays a fictional security alert."],["protected","DEFENCE SHOWN","Virtual files are shown in a protected state."]]},
+ worm:{name:"Worm",label:"WORM",computer:"VIRTUAL NETWORK / DEVICE SIMULATION",scene:"WORM / NETWORK ENVIRONMENT",risk:"HIGH",riskColor:"#ff637a",intro:"A worm can replicate and spread between vulnerable systems. Learn the potential impact, how to contain it, and how to improve network security.",threat:"A computer worm is malware that can replicate itself and spread between vulnerable computers or devices, often over a network.",process:"A worm may take advantage of an unpatched weakness or exposed service to reach other devices and attempt further replication. The network nodes shown here are fictional.",harm:["Network congestion and slower connections.","High use of memory, CPU or other resources.","Disruption may affect multiple connected devices."],solution:["Isolate affected devices from the network.","Use trusted security tools to scan and clean systems.","Patch vulnerabilities and verify recovery before reconnecting devices."],security:["Install operating system and software security updates promptly.","Enable firewalls and disable unnecessary services.","Use strong authentication and appropriate network controls."],riskText:"High potential impact because a worm may affect multiple devices. Severity depends on the worm and network protections.",stages:[
+ ["ready","NETWORK READY","Virtual network model is ready."],["scan","VIRTUAL NODE SELECTED","The starting computer is highlighted."],["spread1","POSSIBLE SPREAD","A connected virtual node is highlighted."],["spread2","NETWORK IMPACT","Additional nodes illustrate possible spread."],["contained","CONTAINMENT EXAMPLE","The firewall and network defence layer are highlighted."],["protected","DEFENCE SHOWN","The virtual network is displayed in a protected state."]]},
+ trojan:{name:"Trojan Horse",label:"TROJAN",computer:"WORKSTATION-01 / APPLICATION SIMULATION",scene:"TROJAN / APPLICATION ENVIRONMENT",risk:"HIGH–CRITICAL",riskColor:"#ff637a",intro:"A Trojan can disguise itself as useful software. Learn what it may do, the risks involved, and how to respond safely.",threat:"A Trojan horse is malware that disguises itself as legitimate or useful software to persuade someone to install and run it.",process:"After a user runs the malicious application, a Trojan may attempt to steal information, enable unauthorized access or install additional malware. The game application shown is fictional.",harm:["Passwords and personal information may be exposed.","Financial data may be put at risk.","Unauthorized access or additional malware may result."],solution:["Stop using the suspicious application and disconnect the device if compromise is suspected.","Use trusted security software to scan, quarantine or remove the app.","From a clean device, change exposed passwords and enable multi-factor authentication.","Contact your bank if payment or banking details may have been exposed."],security:["Download software from official, trusted sources.","Avoid cracked software, suspicious links and unexpected attachments.","Review application permissions and keep security software updated.","Use multi-factor authentication for important accounts."],riskText:"High to critical potential impact, especially if sensitive data or account access is compromised. Actual severity varies.",stages:[
+ ["ready","APPLICATION READY","A fictional application is shown before analysis."],["launch","APP SELECTED","The application appears ordinary in the virtual desktop."],["reveal","UNEXPECTED BEHAVIOUR","The visual label changes to illustrate a possible disguise."],["suspicious","RISK ILLUSTRATED","The app is highlighted as suspicious; no data is accessed."],["detected","SECURITY RESPONSE","The virtual defence panel is highlighted."],["protected","DEFENCE SHOWN","The app and defence layer are shown in a protected state."]]}
+};
+const $=id=>document.getElementById(id);
+const screen=$("computerScreen"),log=$("eventLog"),speed=$("speed");
+let activeThreat="virus",stageIndex=0,timer=null,paused=false,started=false,eventTotal=0,startTime=Date.now(),remaining=0,deadline=0;
+const duration=()=>4200/Number(speed.value);
+function setText(id,value){$(id).textContent=value}
+function addLog(type,message){
+ eventTotal++;
+ const line=document.createElement("div");line.className="console-line "+type;
+ const time=document.createElement("span");time.className="console-time";
+ const sec=Math.max(0,Math.floor((Date.now()-startTime)/1000));time.textContent="00:"+String(sec%60).padStart(2,"0");
+ const msg=document.createElement("span");msg.className="console-msg";msg.textContent=message;
+ line.append(time,msg);log.prepend(line);
+ while(log.children.length>9)log.lastElementChild.remove();
+ setText("metricEvents",String(eventTotal).padStart(2,"0"));setText("eventCount",eventTotal+" events");
+}
+function buildList(id,items){const list=$(id);list.replaceChildren();items.forEach(item=>{const li=document.createElement("li");li.textContent=item;list.appendChild(li)})}
+function renderDetails(){const d=threatData[activeThreat];setText("detailTitle",d.name+" — Threat Details");setText("detailIntro",d.intro);setText("detailThreat",d.threat);setText("detailProcess",d.process);buildList("detailHarm",d.harm);buildList("detailSolution",d.solution);buildList("detailSecurity",d.security);setText("detailRisk",d.risk);setText("detailRiskText",d.riskText);setText("metricThreat",d.label);setText("computerName",d.computer);setText("sceneName",d.scene);document.documentElement.style.setProperty("--accent",activeThreat==="worm"?"#ffbd67":activeThreat==="trojan"?"#bd98ff":"#49e5ff");screen.style.setProperty("--accent",activeThreat==="worm"?"#ffbd67":activeThreat==="trojan"?"#bd98ff":"#49e5ff");$("detailRisk").style.color=d.riskColor}
+function stopTimer(){if(timer!==null){clearTimeout(timer);timer=null}}
+function stageType(stage){if(["attach","activate","launch","scan"].includes(stage))return"info";if(["spread","spread1","spread2","reveal","suspicious"].includes(stage))return"warn";if(["detected","contained"].includes(stage))return"alert";return"safe"}
+function updateVirusFiles(stage){const states={ready:["NORMAL","SAFE","SAFE"],attach:["HOST LINKED","SAFE","SAFE"],activate:["ACTIVE","SAFE","SAFE"],spread:["FLAGGED","FLAGGED","FLAGGED"],detected:["SCANNED","SCANNED","SCANNED"],protected:["PROTECTED","PROTECTED","PROTECTED"]};const v=states[stage]||states.ready;["file1","file2","file3"].forEach((id,i)=>$(id).querySelector(".file-state").textContent=v[i])}
+function renderStage(shouldLog=true){
+ const d=threatData[activeThreat],entry=d.stages[stageIndex],stage=entry[0];
+ screen.dataset.threat=activeThreat;screen.dataset.stage=stage;screen.classList.toggle("is-running",started&&!paused);
+ setText("sceneStatus",entry[1]);setText("screenFoot",entry[2]);
+ const safe=["ready","detected","contained","protected"].includes(stage);setText("screenState",safe?"● DEFENCE / SAFE DEMO":"● VIRTUAL ACTIVITY");
+ setText("metricStatus",stage==="protected"?"PROTECTED":stage==="ready"?"READY":["detected","contained"].includes(stage)?"DETECTION":"SIMULATING");
+ updateVirusFiles(stage);
+ if(activeThreat==="trojan"){
+  setText("appStamp",["ready","launch"].includes(stage)?"NOT ANALYSED":["reveal","suspicious"].includes(stage)?"SUSPICIOUS":"CHECK COMPLETE");
+  setText("defenceTitle",["detected","protected"].includes(stage)?"Defence Active":"Security Scan");
+  setText("defenceSub",["detected","protected"].includes(stage)?"Virtual protection shown":"Virtual protection layer");
+ }
+ $("progressFill").style.width=((stageIndex+1)/d.stages.length*100)+"%";
+ if(shouldLog){const type=stageType(stage),prefix=type==="alert"?"[ALERT]":type==="warn"?"[WARN]":type==="safe"?"[SAFE]":"[INFO]";addLog(type,prefix+" "+entry[2])}
+}
+function scheduleNext(delay=duration()){stopTimer();if(!started||paused)return;deadline=Date.now()+delay;remaining=delay;timer=setTimeout(()=>{timer=null;advanceStage()},delay)}
+function advanceStage(){if(!started||paused)return;const d=threatData[activeThreat];if(stageIndex>=d.stages.length-1){started=false;paused=false;screen.classList.remove("is-running");setText("startBtn","↻ Replay Simulation");setText("pauseBtn","Ⅱ Pause");setText("metricStatus","COMPLETE");return}stageIndex++;renderStage();scheduleNext()}
+function startSimulation(){stopTimer();started=true;paused=false;stageIndex=0;remaining=duration();startTime=Date.now();setText("startBtn","↻ Restart Simulation");setText("pauseBtn","Ⅱ Pause");addLog("info","[INFO] "+threatData[activeThreat].name+" demonstration started.");renderStage();scheduleNext()}
+function chooseThreat(name){activeThreat=name;stageIndex=0;started=false;paused=false;stopTimer();document.querySelectorAll(".threat-btn").forEach(b=>{const chosen=b.dataset.threat===name;b.classList.toggle("active",chosen);b.setAttribute("aria-pressed",String(chosen))});renderDetails();setText("startBtn","▶ Start Simulation");setText("pauseBtn","Ⅱ Pause");addLog("info","[READY] "+threatData[name].name+" selected.");startSimulation()}
+document.querySelectorAll(".threat-btn").forEach(btn=>btn.addEventListener("click",()=>chooseThreat(btn.dataset.threat)));
+$("startBtn").addEventListener("click",startSimulation);
+$("pauseBtn").addEventListener("click",()=>{if(!started){addLog("info","[INFO] Start a simulation before pausing.");return}if(!paused){remaining=Math.max(150,deadline-Date.now());paused=true;stopTimer();screen.classList.remove("is-running");setText("pauseBtn","▶ Resume");addLog("warn","[PAUSED] Animation paused.")}else{paused=false;setText("pauseBtn","Ⅱ Pause");screen.classList.add("is-running");addLog("info","[INFO] Animation resumed.");scheduleNext(remaining||duration())}});
+$("resetBtn").addEventListener("click",()=>{stopTimer();started=false;paused=false;stageIndex=0;screen.classList.remove("is-running");setText("startBtn","▶ Start Simulation");setText("pauseBtn","Ⅱ Pause");renderStage();setText("metricStatus","READY");addLog("safe","[RESET] Virtual scene reset; no real system changes made.")});
+speed.addEventListener("input",()=>{const labels={1:"Very Slow",2:"Slow",3:"Normal",4:"Fast",5:"Very Fast"};setText("speedLabel",labels[speed.value]);if(started&&!paused){remaining=duration();scheduleNext(remaining)}});
+renderDetails();screen.dataset.threat=activeThreat;screen.dataset.stage="ready";setText("sceneStatus","SYSTEM READY");setText("screenFoot","System ready. Start the simulation.");setText("screenState","● SAFE MODE");setText("metricStatus","READY");setText("speedLabel","Normal");updateVirusFiles("ready");
+</script>
+</body>
+</html>
